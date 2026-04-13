@@ -104,15 +104,15 @@ export async function resolveCanvasModule(canvasImport: () => Promise<typeof imp
  * Node.js environments that do not support these constructors natively.
  *
  * @remarks
- * If a constructor is already defined in the global scope,
- * it will not be overridden.
+ * `DOMMatrix` is always set because {@link stubBrowserGlobals} may have
+ * installed a minimal stub to allow PDF.js to import – the real
+ * `@napi-rs/canvas` implementation must take precedence for rendering.
  */
 export function injectCanvasConstructors() {
   if (!resolvedCanvasModule)
     return
 
-  if (typeof globalThis.DOMMatrix === 'undefined')
-    globalThis.DOMMatrix = resolvedCanvasModule.DOMMatrix as unknown as typeof DOMMatrix
+  globalThis.DOMMatrix = resolvedCanvasModule.DOMMatrix as unknown as typeof DOMMatrix
 
   if (typeof globalThis.ImageData === 'undefined')
     globalThis.ImageData = resolvedCanvasModule.ImageData as unknown as typeof ImageData

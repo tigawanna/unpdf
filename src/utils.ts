@@ -1,5 +1,6 @@
 import type { DocumentInitParameters, PDFDocumentProxy } from 'pdfjs-dist/types/src/display/api'
 import type * as PDFJS from 'pdfjs-dist/types/src/pdf'
+import { stubBrowserGlobals } from './_internal/env'
 
 let resolvedModule: typeof PDFJS | undefined
 
@@ -45,6 +46,8 @@ export async function resolvePDFJSImport(
   if (resolvedModule && !reload) {
     return
   }
+
+  stubBrowserGlobals()
 
   if (pdfjsResolver) {
     try {

@@ -8,6 +8,7 @@ import {
   extractImages,
   extractLinks,
   extractText,
+  extractTextItems,
   getDocumentProxy,
   getMeta,
   getResolvedPDFJS,
@@ -59,6 +60,29 @@ describe('unpdf', () => {
 
     expect(text[0]).toMatchInlineSnapshot('"Dummy PDF file"')
     expect(totalPages).toMatchInlineSnapshot('1')
+  })
+
+  it('extracts structured text items from a PDF', async () => {
+    const { items, totalPages } = await extractTextItems(await getPDF())
+
+    expect(totalPages).toBe(1)
+    expect(items).toHaveLength(1)
+    expect(items[0]!.length).toBeGreaterThan(0)
+
+    const firstItem = items[0]![0]!
+    expect(firstItem).toMatchInlineSnapshot(`
+      {
+        "dir": "ltr",
+        "fontFamily": "sans-serif",
+        "fontSize": 16.1,
+        "hasEOL": false,
+        "height": 16.1,
+        "str": "Dummy PDF file",
+        "width": 123.41130000000003,
+        "x": 56.8,
+        "y": 758.1,
+      }
+    `)
   })
 
   it('extracts links from a PDF', async () => {

@@ -2,7 +2,7 @@
 
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 import replace from '@rollup/plugin-replace'
-import terser from '@rollup/plugin-terser'
+import { minify } from 'rollup-plugin-esbuild'
 import { defineConfig } from 'rollup'
 import { pdfjsTypes } from './src/pdfjs-serverless/rollup/plugins'
 
@@ -52,14 +52,10 @@ export default defineConfig({
     }),
     nodeResolve(),
     pdfjsTypes(),
-    terser({
-      mangle: {
-        keep_fnames: true,
-        keep_classnames: true,
-      },
-      format: {
-        comments: false,
-      },
+    minify({
+      keepNames: true,
+      legalComments: 'none',
+      target: 'es2022',
     }),
   ],
 })

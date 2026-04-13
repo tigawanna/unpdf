@@ -15,7 +15,7 @@ export async function definePDFJSModule(pdfjs: () => Promise<any>) {
   await resolvePDFJSImport(pdfjs, { reload: true })
 }
 
-/** @deprecated Use `definePDFJSModule` instead. */
+/** @deprecated Use `definePDFJSModule` instead. Will be removed in v2. */
 export async function configureUnPDF(options: { pdfjs?: () => Promise<any> }) {
   await resolvePDFJSImport(options.pdfjs, { reload: true })
 }

@@ -36,7 +36,7 @@ export default defineConfig({
       preventAssignment: true,
       values: {
         // Force inlining the PDF.js worker.
-        'await import(/*webpackIgnore: true*/this.workerSrc)': '__pdfjsWorker__',
+        'await import(\n      /*webpackIgnore: true*/\n      /*@vite-ignore*/\n      this.workerSrc)': '__pdfjsWorker__',
         // Force setting up fake PDF.js worker.
         '#isWorkerDisabled = false': '#isWorkerDisabled = true',
         // Remove WASM code from the worker.

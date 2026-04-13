@@ -1,40 +1,25 @@
 # unpdf
 
-A collection of utilities for PDF extraction and rendering. Designed specifically for serverless environments, but it also works in Node.js, Deno, Bun and the browser. `unpdf` is particularly useful for serverless AI applications, especially for summarizing PDF documents in document analysis workflows.
+Utilities for PDF extraction and rendering across all JavaScript runtimes – Node.js, Deno, Bun, the browser, and serverless environments like Cloudflare Workers. Especially useful for AI applications that need to summarize or analyze PDF documents.
 
-This library ships with a serverless build/redistribution of Mozilla's [PDF.js](https://github.com/mozilla/pdf.js) that is optimized for edge environments. Some string replacements, global mocks and inlining the PDF.js worker allow the browser code to become platform agnostic. See [`pdfjs.rollup.config.ts`](./pdfjs.rollup.config.ts) for the details.
-
-This library is also intended as a modern alternative to the unmaintained but still popular [`pdf-parse`](https://www.npmjs.com/package/pdf-parse).
+Ships with a serverless build of Mozilla's [PDF.js](https://github.com/mozilla/pdf.js), optimized for edge environments. If you're coming from [`pdf-parse`](https://www.npmjs.com/package/pdf-parse), `unpdf` is a modern, actively maintained alternative with broader runtime support.
 
 ## Features
 
-- 🏗️ Made for Node.js, browser and serverless environments
+- 🏗️ Works in Node.js, browser and serverless environments
 - 🪭 Includes serverless build of PDF.js ([`unpdf/pdfjs`](./package.json#L34))
 - 💬 Extract [text](#extract-text-from-pdf), [links](#extractlinks), and [images](#extractimages) from PDF files
 - 🧠 Perfect for AI applications and PDF summarization
-- 🧱 Opt-in to legacy PDF.js build
-- 💨 Zero dependencies
-
-## PDF.js Compatibility
-
-> [!Tip]
-> The serverless PDF.js bundle provided by `unpdf` is built from PDF.js v5.4.394.
-
-You can use an [official PDF.js build](#official-or-legacy-pdfjs-build) by using the [`definePDFJSModule`](#definepdfjsmodule) method. This is useful if you want to use a specific version or a custom build of PDF.js.
+- 🧱 Opt-in to official or legacy PDF.js build
 
 ## Installation
 
-Run the following command to add `unpdf` to your project.
-
 ```bash
 # pnpm
-pnpm add -D unpdf
+pnpm add unpdf
 
 # npm
-npm install -D unpdf
-
-# yarn
-yarn add -D unpdf
+npm install unpdf
 ```
 
 ## Usage
@@ -44,15 +29,11 @@ yarn add -D unpdf
 ```ts
 import { extractText, getDocumentProxy } from 'unpdf'
 
-// Either fetch a PDF file from the web or load it from the file system
+// Fetch a PDF from the web or load it from the file system
 const buffer = await fetch('https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf')
   .then(res => res.arrayBuffer())
-const buffer = await readFile('./dummy.pdf')
 
-// Then, load the PDF file into a PDF.js document
 const pdf = await getDocumentProxy(new Uint8Array(buffer))
-
-// Finally, extract the text from the PDF file
 const { totalPages, text } = await extractText(pdf, { mergePages: true })
 
 console.log(`Total pages: ${totalPages}`)
@@ -64,9 +45,9 @@ console.log(text)
 Usually you don't need to worry about the PDF.js build. `unpdf` ships with a serverless build of the latest PDF.js version. However, if you want to use the official PDF.js version or the legacy build, you can define a custom PDF.js module.
 
 > [!WARNING]
-> PDF.js v5.x uses `Promise.withResolvers`, which may not be supported in all environments, such as Node < 22. Consider to use the bundled serverless build, which includes a polyfill, or use an older version of PDF.js.
+> PDF.js v5.x uses `Promise.withResolvers`, which may not be supported in all environments, such as Node < 22. Consider using the bundled serverless build, which includes a polyfill, or use an older version of PDF.js.
 
-For example, if you want to use the official PDF.js build, you can do the following:
+For example, if you want to use the official PDF.js build:
 
 ```ts
 import { definePDFJSModule, extractText, getDocumentProxy } from 'unpdf'
@@ -106,6 +87,17 @@ const document = await getDocument(new Uint8Array(data)).promise
 
 console.log(await document.getMetadata())
 ```
+
+## How It Works
+
+> [!NOTE]
+> The serverless PDF.js bundle is built from PDF.js v5.6.205.
+
+Heart and soul of this package is the [`pdfjs.rollup.config.ts`](./pdfjs.rollup.config.ts) file. It uses [Rollup](https://rollupjs.org/) to bundle PDF.js into a single file for serverless environments. The key techniques:
+
+- **String replacements** strip browser-specific references from the PDF.js source.
+- **Worker inlining** embeds the PDF.js worker directly into the main bundle, since serverless runtimes can't load separate worker files.
+- **Global polyfills** provide missing APIs like `FinalizationRegistry` (unavailable in Cloudflare Workers).
 
 ## API
 
@@ -209,15 +201,7 @@ for (const link of links) console.log(link)
 
 ### `extractImages`
 
-Extracts images from a specific page of a PDF document, including necessary metadata such as width, height, and calculated color channels.
-
-> [!NOTE]
-> This method will only work in Node.js and browser environments.
-
-In order to use this method, make sure to meet the following requirements:
-
-- Use the official PDF.js build (see below for details).
-- Install the [`@napi-rs/canvas`](https://github.com/Brooooooklyn/canvas) package if you are using Node.js. This package is required to render the PDF page as an image.
+Extracts images from a specific page of a PDF document, including necessary metadata such as width, height, and calculated color channels. Works with both the serverless and official PDF.js build.
 
 **Type Declaration**
 
@@ -285,7 +269,7 @@ To render a PDF page as an image, you can use the `renderPageAsImage` method. Th
 
 In order to use this method, make sure to meet the following requirements:
 
-- Use the official PDF.js build (see below for details).
+- Use the official PDF.js build (see [Official or Legacy PDF.js Build](#official-or-legacy-pdfjs-build)).
 - Install the [`@napi-rs/canvas`](https://github.com/Brooooooklyn/canvas) package if you are using Node.js. This package is required to render the PDF page as an image.
 
 **Type Declaration**

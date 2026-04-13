@@ -1,8 +1,6 @@
-// PDF.js initializes a top-level constant from `DOMMatrix`,
-// which is not available in serverless environments.
-if (typeof globalThis.DOMMatrix === 'undefined') {
-  globalThis.DOMMatrix = class DOMMatrix {}
-}
+import { polyfillDOMMatrix } from '../_internal/dommatrix-polyfill'
+
+polyfillDOMMatrix()
 
 // `FinalizationRegistry` is not available in Cloudflare Workers.
 if (typeof globalThis.FinalizationRegistry === 'undefined') {

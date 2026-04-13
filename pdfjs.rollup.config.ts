@@ -1,7 +1,7 @@
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 import replace from '@rollup/plugin-replace'
 import { defineConfig } from 'rollup'
-import { minify } from 'rollup-plugin-esbuild'
+import esbuild, { minify } from 'rollup-plugin-esbuild'
 import { pdfjsTypes } from './src/pdfjs-serverless/rollup/plugins'
 
 const canvasMock = `
@@ -48,6 +48,7 @@ export default defineConfig({
         'warn("Please use the `legacy` build in Node.js environments.")': '',
       },
     }),
+    esbuild({ include: /\/src\/.*\.ts$/ }),
     nodeResolve(),
     pdfjsTypes(),
     minify({

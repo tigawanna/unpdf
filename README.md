@@ -272,6 +272,22 @@ In order to use this method, make sure to meet the following requirements:
 - Use the official PDF.js build (see [Official or Legacy PDF.js Build](#official-or-legacy-pdfjs-build)).
 - Install the [`@napi-rs/canvas`](https://github.com/Brooooooklyn/canvas) package if you are using Node.js. This package is required to render the PDF page as an image.
 
+> [!TIP]
+> If fonts render incorrectly, create a `PDFDocumentProxy` with custom options and pass it directly:
+>
+> ```ts
+> import { getDocumentProxy, renderPageAsImage } from 'unpdf'
+>
+> const pdf = await getDocumentProxy(buffer, {
+>   disableFontFace: true,
+>   standardFontDataUrl: 'https://unpkg.com/pdfjs-dist@latest/standard_fonts/',
+> })
+>
+> const image = await renderPageAsImage(pdf, 1, {
+>   canvasImport: () => import('@napi-rs/canvas'),
+> })
+> ```
+
 **Type Declaration**
 
 ```ts

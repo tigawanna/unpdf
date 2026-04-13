@@ -14,17 +14,37 @@ export const isBrowser = typeof window !== 'undefined'
  * Applies the following defaults:
  * - `isEvalSupported: false`
  * - `useSystemFonts: true`
+ *
+ * In Node.js environments, additionally applies:
+ * - `disableFontFace: true`
+ * - `standardFontDataUrl` resolved from the local `pdfjs-dist` package
  */
 export async function getDocumentProxy(
   data: DocumentInitParameters['data'],
   options: DocumentInitParameters = {},
 ) {
   const { getDocument } = await getResolvedPDFJS()
+
+  let nodeDefaults: Partial<DocumentInitParameters> = {}
+  if (isNode) {
+    try {
+      const base = import.meta.resolve('pdfjs-dist/package.json')
+      nodeDefaults = {
+        disableFontFace: true,
+        standardFontDataUrl: new URL('./standard_fonts/', base).href,
+      }
+    }
+    catch {
+      // pdfjs-dist not installed (e.g. using serverless bundle), skip font defaults
+    }
+  }
+
   const pdf = await getDocument({
     data,
     isEvalSupported: false,
     // See: https://github.com/mozilla/pdf.js/issues/4244#issuecomment-1479534301
     useSystemFonts: true,
+    ...nodeDefaults,
     ...options,
   }).promise
 

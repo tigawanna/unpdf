@@ -273,18 +273,12 @@ In order to use this method, make sure to meet the following requirements:
 - Install the [`@napi-rs/canvas`](https://github.com/Brooooooklyn/canvas) package if you are using Node.js. This package is required to render the PDF page as an image.
 
 > [!TIP]
-> If fonts render incorrectly, create a `PDFDocumentProxy` with custom options and pass it directly:
+> In Node.js, `getDocumentProxy` automatically sets `disableFontFace: true` and resolves `standardFontDataUrl` from your local `pdfjs-dist` package for correct font rendering. To customize this behavior, pass your own options:
 >
 > ```ts
-> import { getDocumentProxy, renderPageAsImage } from 'unpdf'
->
 > const pdf = await getDocumentProxy(buffer, {
->   disableFontFace: true,
+>   disableFontFace: false,
 >   standardFontDataUrl: 'https://unpkg.com/pdfjs-dist@latest/standard_fonts/',
-> })
->
-> const image = await renderPageAsImage(pdf, 1, {
->   canvasImport: () => import('@napi-rs/canvas'),
 > })
 > ```
 
